@@ -33,8 +33,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
-import com.example.dahlem.RGBAdjustment.RGBAdjustment;
-
 public class RGBAdjustment {
 
 	private volatile Display display;
@@ -82,6 +80,7 @@ public class RGBAdjustment {
 	private Label helpLabel;
 	private Timer helpTimer;
 	private Runnable hideHelpRunnable;
+	private ColorDialog colorSelector;
 	private Image fImage;
 	private Color fColor;
 	private Button color_button;
@@ -263,16 +262,6 @@ public class RGBAdjustment {
 				case SWT.F1:
 					// show help on F1
 					RGBAdjustment.this.showHelp();
-					break;
-				case 'o':
-					increaseColorBrightness();
-					RGBAdjustment.this.refreshBackground(
-							display.getActiveShell(), r, g, b);
-					break;
-				case 'l':
-					decreaseColorBrightness();
-					RGBAdjustment.this.refreshBackground(
-							display.getActiveShell(), r, g, b);
 					break;
 				default:
 					// do nothing, unimplmeneted key pressed
@@ -566,7 +555,7 @@ public class RGBAdjustment {
 	 *            - the window used to calculate
 	 * @return <code>Point</code>
 	 */
-	private static Point computeImageSize(Control window, Button button) {
+	private Point computeImageSize(Control window, Button button) {
 		GC gc = new GC(window);
 		Font f = button.getFont();
 		gc.setFont(f);
@@ -772,59 +761,6 @@ public class RGBAdjustment {
 		LOGGER.info("Closing program...");
 	}
 
-	private void increaseColorHue(){
-		increaseHSVIndex(0, 1/6.0, true);
-	}
-	
-	private void increaseColorSaturation(){
-		increaseHSVIndex(1,1, true);
-	}
-	
-	private void increaseColorBrightness(){
-		increaseHSVIndex(2,1, false);
-	}
-	
-
-	private void decreaseColorHue(){
-		increaseHSVIndex(0, -1/6.0, true);
-	}
-	
-	private void decreaseColorSaturation(){
-		increaseHSVIndex(1,-1, true);
-	}
-	
-	private void decreaseColorBrightness(){
-		increaseHSVIndex(2,-1, false);
-	}
-	/**
-	 * Increases the H S or V value determined by index. The increasevalue is set by the variable interval.
-	 * @param index 0 = H, 1 = S, 2 = V
-	 * @param incrementMultiplier 1 for increase, -1 for decrease, could be any other value to adapt increase values
-	 * @param cyclic cycle from 1 to 0 or stop at 1 or 0
-	 */
-	private void increaseHSVIndex(int index, double incrementMultiplier, boolean cyclic){
-		float hsvVals[] = new float[3];
-		int rgbVal;
-		hsvVals = java.awt.Color.RGBtoHSB(this.r, this.g, this.b, null);
-		if(cyclic){
-			hsvVals[index] = (float) ((hsvVals[index] + (incrementMultiplier * interval / 255.0) + 1) % 1.0); //plus 1 to avoid negative modulo
-		}else{
-			hsvVals[index] = clamp((float) (hsvVals[index] + (incrementMultiplier * interval / 255.0)), 0.0f, 1.0f );
-		}
-		rgbVal =java.awt.Color.HSBtoRGB(hsvVals[0], hsvVals[1], hsvVals[2]);
-		 java.awt.Color rgb = new java.awt.Color(rgbVal);
-		this.r = rgb.getRed();
-		this.g = rgb.getGreen();
-		this.b = rgb.getBlue();
-		 
-
-	}
-	
-	private static float clamp(float value, float min, float max){
-		return Math.max(min, Math.min(value, max));
-	}
-
-
 	private void increaseColor() {
 
 		if (this.onlyGrey) {
@@ -849,30 +785,29 @@ public class RGBAdjustment {
 			}
 
 		} else {
-			increaseColorHue();
-//			if (RGBAdjustment.this.b < 255) {
-//				RGBAdjustment.this.b += interval;
-//				RGBAdjustment.this.b = RGBAdjustment.this.b > 255 ? 255
-//						: RGBAdjustment.this.b;
-//			} else {
-//				if (RGBAdjustment.this.g < 255) {
-//					RGBAdjustment.this.g += interval;
-//					RGBAdjustment.this.g = RGBAdjustment.this.g > 255 ? 255
-//							: RGBAdjustment.this.g;
-//					RGBAdjustment.this.b = 0;
-//				} else {
-//					if (RGBAdjustment.this.r < 255) {
-//						RGBAdjustment.this.r += interval;
-//						RGBAdjustment.this.r = RGBAdjustment.this.r > 255 ? 255
-//								: RGBAdjustment.this.r;
-//						RGBAdjustment.this.g = 0;
-//					} else {
-//						RGBAdjustment.this.r = 0;
-//						RGBAdjustment.this.g = 0;
-//						RGBAdjustment.this.b = 0;
-//					}
-//				}
-//			}
+			if (RGBAdjustment.this.b < 255) {
+				RGBAdjustment.this.b += interval;
+				RGBAdjustment.this.b = RGBAdjustment.this.b > 255 ? 255
+						: RGBAdjustment.this.b;
+			} else {
+				if (RGBAdjustment.this.g < 255) {
+					RGBAdjustment.this.g += interval;
+					RGBAdjustment.this.g = RGBAdjustment.this.g > 255 ? 255
+							: RGBAdjustment.this.g;
+					RGBAdjustment.this.b = 0;
+				} else {
+					if (RGBAdjustment.this.r < 255) {
+						RGBAdjustment.this.r += interval;
+						RGBAdjustment.this.r = RGBAdjustment.this.r > 255 ? 255
+								: RGBAdjustment.this.r;
+						RGBAdjustment.this.g = 0;
+					} else {
+						RGBAdjustment.this.r = 0;
+						RGBAdjustment.this.g = 0;
+						RGBAdjustment.this.b = 0;
+					}
+				}
+			}
 		}
 	}
 
@@ -898,30 +833,29 @@ public class RGBAdjustment {
 						: RGBAdjustment.this.b;
 			}
 		} else {
-			decreaseColorHue();
-//			if (RGBAdjustment.this.b > 0) {
-//				RGBAdjustment.this.b -= interval;
-//				RGBAdjustment.this.b = RGBAdjustment.this.b < 0 ? 0
-//						: RGBAdjustment.this.b;
-//			} else {
-//				if (RGBAdjustment.this.g > 0) {
-//					RGBAdjustment.this.g -= interval;
-//					RGBAdjustment.this.g = RGBAdjustment.this.g < 0 ? 0
-//							: RGBAdjustment.this.g;
-//					RGBAdjustment.this.b = 255;
-//				} else {
-//					if (RGBAdjustment.this.r > 0) {
-//						RGBAdjustment.this.r -= interval;
-//						RGBAdjustment.this.r = RGBAdjustment.this.r < 0 ? 0
-//								: RGBAdjustment.this.r;
-//						RGBAdjustment.this.g = 255;
-//					} else {
-//						RGBAdjustment.this.r = 255;
-//						RGBAdjustment.this.g = 255;
-//						RGBAdjustment.this.b = 255;
-//					}
-//				}
-//			}
+			if (RGBAdjustment.this.b > 0) {
+				RGBAdjustment.this.b -= interval;
+				RGBAdjustment.this.b = RGBAdjustment.this.b < 0 ? 0
+						: RGBAdjustment.this.b;
+			} else {
+				if (RGBAdjustment.this.g > 0) {
+					RGBAdjustment.this.g -= interval;
+					RGBAdjustment.this.g = RGBAdjustment.this.g < 0 ? 0
+							: RGBAdjustment.this.g;
+					RGBAdjustment.this.b = 255;
+				} else {
+					if (RGBAdjustment.this.r > 0) {
+						RGBAdjustment.this.r -= interval;
+						RGBAdjustment.this.r = RGBAdjustment.this.r < 0 ? 0
+								: RGBAdjustment.this.r;
+						RGBAdjustment.this.g = 255;
+					} else {
+						RGBAdjustment.this.r = 255;
+						RGBAdjustment.this.g = 255;
+						RGBAdjustment.this.b = 255;
+					}
+				}
+			}
 		}
 	}
 
