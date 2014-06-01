@@ -91,18 +91,22 @@ public class RGBAdjustment {
 	private Button onlyGreyButton;
 	private Label onlyGreyLabel;
 
-	private static String helpText = "'f':\t\t\t\t\t\t\t\tToggle Fullscreen\n"
-			+ "'x','q' or 'ESC':\t\t\t\tClose program\n"
-			+ "'Space' or 'Enter':\t\t\t\tPause/Resume auto increment colors\n"
-			+ "'-' / '+':\t\t\t\t\t\t\tDecrease/Increase Color update frequency for the auto increment. Value is given in ms\n"
-			+ "'Down-Arrow' / 'Up-Arrow':\tDecrease/Increase the interval for color changes\n"
-			+ "'Left-Arrow' / 'Right-Arrow':\tManually decrease/increase color\n"
-			+ "'w':\t\t\t\t\t\t\tToogle black and white mode\n"
-			+ "'c':\t\t\t\t\t\t\t\tOpen color dialog\n"
-			+ "'r':\t\t\t\t\t\t\t\tSet color to constant 'red' <-> RGB(255,0,0)\n"
-			+ "'g':\t\t\t\t\t\t\t\tSet color to constant 'green' <-> RGB(0,255,0)\n"
-			+ "'b':\t\t\t\t\t\t\t\tSet color to constant 'blue' <-> RGB(0,0,255)\n"
-			+ "'i','h' or 'F1':\t\t\t\t\tShow this help";
+	private static String helpText = "'f': Toggle Fullscreen\n"
+			+ "'x','q' or 'ESC': Close program\n"
+			+ "'Space' or 'Enter':Pause/Resume auto increment colors\n"
+			+ "'-' / '+': Decrease/Increase Color update frequency for the auto increment. Value is given in ms\n"
+			+ "'Down-Arrow' / 'Up-Arrow': Decrease/Increase the interval for color changes\n"
+			+ "'Left-Arrow' / 'Right-Arrow': Manually decrease/increase color\n"
+			+ "'w': Toogle black and white mode\n"
+			+ "'c': Open color dialog\n"
+			+ "'r': Set color to constant 'red' <-> RGB(255,0,0)\n"
+			+ "'g': Set color to constant 'green' <-> RGB(0,255,0)\n"
+			+ "'b': Set color to constant 'blue' <-> RGB(0,0,255)\n"
+			+ "'i','h' or 'F1': Show this help\n"
+			+ "'u' increase saturation\n"
+			+ "'j' decrease saturation\n"
+			+ "'o' increase brightness\n"
+			+ "'l' decrease brightness";
 	
 	private class MyTimerTask extends TimerTask {
 
@@ -125,8 +129,8 @@ public class RGBAdjustment {
 	public RGBAdjustment() {
 		// create default color
 		this.r = 0;
-		this.g = 0;
-		this.b = 0;
+		this.g = 145;
+		this.b = 255;
 		
 		LOGGER.setLevel(Level.WARNING);
 
@@ -271,6 +275,16 @@ public class RGBAdjustment {
 					break;
 				case 'l':
 					decreaseColorBrightness();
+					RGBAdjustment.this.refreshBackground(
+							display.getActiveShell(), r, g, b);
+					break;
+				case 'u':
+					increaseColorSaturation();
+					RGBAdjustment.this.refreshBackground(
+							display.getActiveShell(), r, g, b);
+					break;
+				case 'j':
+					decreaseColorSaturation();
 					RGBAdjustment.this.refreshBackground(
 							display.getActiveShell(), r, g, b);
 					break;
@@ -777,7 +791,7 @@ public class RGBAdjustment {
 	}
 	
 	private void increaseColorSaturation(){
-		increaseHSVIndex(1,1, true);
+		increaseHSVIndex(1,1, false);
 	}
 	
 	private void increaseColorBrightness(){
@@ -790,7 +804,7 @@ public class RGBAdjustment {
 	}
 	
 	private void decreaseColorSaturation(){
-		increaseHSVIndex(1,-1, true);
+		increaseHSVIndex(1,-1, false);
 	}
 	
 	private void decreaseColorBrightness(){
