@@ -63,6 +63,8 @@ Key(s) | Action
 'g' |                         Set color to constant 'green' <-> RGB(0,255,0)
 'b' |                         Set color to constant 'blue' <-> RGB(0,0,255)
 'i','h' or 'F1' |              Show the help
+'u', 'j' | change saturation
+'o', 'l' | change brightness
 
 ## Screenshots
 Click to view
